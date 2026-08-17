@@ -216,6 +216,27 @@ corr 0.994）；opju/报告已切回。**教训：Rf 最优 ≠ 最好，σ² �
 显式化）+ 第二壳层 C 2.0@2.91，Rf 0.0128。recipe 12 +
 xafs_good_fit_triptych（三重贴合展示图，含实部）。
 
+## 七点十一、全套数据资产与 Fe K 边方法学（用户第三次推动）
+
+**全套资产清单**（微信文件存储区抢救至 data/raw/synchrotron_full/，
+重复件已 md5 去重）：
+- Pt 线：Pt-sample.prj（样品+Pt_foil/PtO/PtO2）+ XAFS_Report.docx
+- **Fe 线：athena.prj = Fe_foil/FeO/Fe3O4/Fe2O3 标样套**（Fe K 边，
+  446 点×4，E0 已锁 7112.0/7119.5/7124.0/7126.0 eV）——此前漏学
+- 委托单（巩青娜，样品 1 个）——外包流程：委托→测样→Athena→Artemis→报告
+
+**Fe K 边方法学补课**（recipe 13，figcheck ALL PASS）：
+- 四标样 XANES 叠图 + 边区
+- **边位-价态标定曲线**：E0 随价态 0→3 移动 14 eV，线性 ~4.7 eV/价态
+  （实测拟合），R²>0.99——Fe 样品边位可直读价态
+- 一阶导叠图（Fe3O4 双价态边形特征）
+- LCF 自一致性验证：70% FeO+30% Fe2O3 合成谱 NNLS 恢复 0.70/0.30
+  零误差（数学正确性；真实样品 LCF 待 Fe 样品谱）
+
+**别人流程 vs 我们覆盖度**：委托/测样（线下，不覆盖）→ Athena 处理
+（✅Larch 等价）→ 拟合（✅feffit 全链+审计纪律）→ 报告交付（✅docx
+生成器）→ **Fe 线待补：真实 Fe 样品谱到手后 LCF 价态定量 + EXAFS**。
+
 ## 八、下一步（backlog）
 
 1. ~~本地装库~~（✅ 2026-08-17，第六节）
