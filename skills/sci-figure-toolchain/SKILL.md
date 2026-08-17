@@ -78,6 +78,10 @@ $O graph export -n Graph1 -o fig.pdf          # 矢量（内部走 expGraph）
 - **page 尺寸陷阱**：`page.width/height` 赋值导致导出 0.4mm 空页——
   页面规格化不在 Origin 内做，导出默认页（内容完整）后由 PyMuPDF
   组合层 1:1 规格化到 183mm（矢量无损失，单图无跨面板一致性风险）
+- **工程保存**（2026-08-18 实证）：`save -i x.opju` 产出的是 **.oggu**
+  graph 附件不是工程；LabTalk `save "path"` 对未命名工程静默失败——
+  **一律用 Python API `op.save(path)`** 存 .opju；expGraph 只导出
+  **活动图**（多图需逐图 `win -a` 激活导出或 merge 页）
 - **字体审计必查**：中文版 Origin 导出 PDF 字体为 **SimSun**（宋体，
   投稿不合格）——get_fonts 白名单会拦；要么在 Origin 模板层改字体，
   要么走 matplotlib 仿 Origin 主题（Arial，四边框+内向刻度+框图例，

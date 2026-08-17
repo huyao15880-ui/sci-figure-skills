@@ -26,3 +26,15 @@
 前人模板字体混用（XANES 图无衬线、拟合图 Times 衬线观感）；复刻统一
 **Arial**（投稿技术审查安全）。其余视觉要素 1:1 保留——客户辨识度来自
 蓝/红配对与轴题措辞，字体统一不影响"像前人风格"的观感判定。
+
+
+## 模板工程交付（2026-08-18 定型）
+
+- 模板文件：`skills/sci-figure-plot/recipes/xafs_group_template.opju`
+  （XAFS + RSpace 双数据表 + Graph1 XANES 叠图 + Graph2 R 空间拟合图，
+  前人样式已内建，originpro `op.save()` 生成，CLI 复开验证通过）
+- 交付流程：**数据 → 基于模板工程填数 → 另存客户 .opju + 导出 PDF**
+  （客户拿到可在自己 Origin 里继续编辑的原文件）
+- 已知边界：中文版 Origin 的图内默认字体为 SimSun——模板首次交付前
+  人工在 Origin 里全选统一 Arial（约 2 分钟，一次操作后续订单继承）；
+  LabTalk 批量字体替换（doc -e LBL）实测无效

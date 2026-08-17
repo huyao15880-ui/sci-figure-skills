@@ -24,6 +24,15 @@
 - 实战背景：Nature Communications 投稿六图 + SI 三图全流程
   （最终坐标系原则、数值一致性校验、QA 闭环均在该投稿中验证）
 
+### 补充（08-18 四批）
+
+- **Origin 模板工程 .opju 交付定型**（recipe 09）：前人样式内建的双页
+  模板（XANES 叠图 + R 空间蓝/红拟合），客户交付物 = 可编辑 .opju 原文件；
+  CLI 复开验证（4 pages/2 graphs 各 2 plots）
+- 新坑入册：`save -i` 产出 .oggu 非 .opju；LabTalk save 静默失败 →
+  一律 `op.save(path)`；expGraph 只导活动图；SimSun 首次交付前人工
+  2 分钟统一字体（doc -e LBL 批量替换无效）
+
 ### 补充（08-18 三批）
 
 - **前人 Origin 模板提取与复刻**：data/raw/Figure 7 张 WMF 转换 + 4 张
