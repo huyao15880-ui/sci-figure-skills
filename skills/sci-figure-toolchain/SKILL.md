@@ -50,7 +50,7 @@ $O data dump -i x.oggu -d Book1_G -d Book1_H -o out.csv   # 全精度，含误�
   （`get <ds> -e nend` 定界）
 - `%C`(doc -e P) 只给 Y 列；X/误差要用 `doc -e D`
 
-**数据→图→导出（验证过的配方）**
+**数据→图→导出（验证过的配方，2026-08-18 XANES 双曲线全链复验）**
 ```python
 op.new_book("w", "name"); sh = wb[0]
 sh.from_list(0, x, lname="t", units="s", axis="X")
@@ -65,6 +65,23 @@ $O graph export -n Graph1 -o fig.pdf          # 矢量（内部走 expGraph）
 ```
 - 多面板组图：`win -t plot merge;` 生成合并页
 - 线性拟合：激活含 plot 的层后 `lr -2;` → `lr.a / lr.b`
+
+**建图全链坑册（2026-08-18 实战沉淀，recipe 07 为可复跑参照）**
+- **会话寿命**：CLI 每次 `exec` 是独立 COM 会话，实例随命令结束退出——
+  多步建图必须**单次会话内完成**（originpro 直连或一整段 LabTalk），
+  跨会话引用上一步的 sheet/graph 全部落空
+- **impASC 分块陷阱**：外部 CSV 导入会把数据拆成 `_A/_B/_C` 多页
+  （NaN 空行/CRLF 均疑因，去表头+LF 仍复现）——**填数一律用
+  `sh.from_list()` 直写**，不走 impASC
+- **plotxy range 语法**：`[Book]Sheet!2` 短名形式可靠；`[<new>]` 目标
+  图形式在 9.80 不稳——第二条曲线用 `ogl:=[Graph1]` 显式落图
+- **page 尺寸陷阱**：`page.width/height` 赋值导致导出 0.4mm 空页——
+  页面规格化不在 Origin 内做，导出默认页（内容完整）后由 PyMuPDF
+  组合层 1:1 规格化到 183mm（矢量无损失，单图无跨面板一致性风险）
+- **字体审计必查**：中文版 Origin 导出 PDF 字体为 **SimSun**（宋体，
+  投稿不合格）——get_fonts 白名单会拦；要么在 Origin 模板层改字体，
+  要么走 matplotlib 仿 Origin 主题（Arial，四边框+内向刻度+框图例，
+  主题配方见 recipe 07 对比图）
 
 **☠️ 原生崩溃点（禁用，已内置绕行）**
 - `save_fig` 传 .pdf/.eps → 进程崩溃（exit 127 且吞缓冲输出）→ 用 expGraph

@@ -24,6 +24,18 @@
 - 实战背景：Nature Communications 投稿六图 + SI 三图全流程
   （最终坐标系原则、数值一致性校验、QA 闭环均在该投稿中验证）
 
+### 补充（08-18 二批）
+
+- **Origin 出图全链打通**（recipe 07）：originpro from_list 填数 →
+  plotxy 双曲线 → LabTalk 样式 → expGraph 导出 → PyMuPDF 183mm 规格化，
+  PDF 183×140mm 内容完整（XANES 双曲线+图例+轴题+Origin 四边框内向刻度）
+- **matplotlib 仿 Origin 主题**对比版（183×130mm，四边框/内向刻度/
+  框图例/Arial）——无 Origin 环境的可规模化路线
+- **字体审计关键发现**：中文版 Origin 导出 PDF 字体 = SimSun（投稿
+  不合格）→ 投稿走 matplotlib 主题版或 Origin 模板层改字体
+- 坑册沉淀进 sci-figure-toolchain（会话寿命/impASC 分块/plotxy 语法/
+  page 尺寸 0.4mm 空页/SimSun 字体五坑全记录）
+
 ### 补充（08-18 一批）
 
 - **XAFS 期刊风格交付报告**（xafs_report_builder.py）：Athena 工程 →
