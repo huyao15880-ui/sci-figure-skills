@@ -63,9 +63,19 @@ cp -r sci-figure-skills/skills/* ~/.claude/skills/     # Claude Code
 
 本仓库按 [`growth/CONTRIBUTING.md`](growth/CONTRIBUTING.md) 三通道沉淀：**配方**（这次怎么画成的）→ `skills/*/recipes/`；**教训**（错在哪、规则改了什么）→ SKILL.md 规则增量（能写成断言的必须 CODE 形态）；**数据集形态** → `datasets/DATASET_INDEX.md` 注册。每次实战让仓库单调变强。
 
+## figcheck — 投稿就绪审计 CLI（已发布 MVP）
+
+```bash
+python code/figcheck/figcheck.py figure.pdf --journal nature --expect "Energy (eV)"
+```
+六项检查：页内墨迹 / 字体白名单（抓 SimSun·Type3·DejaVu）/ U+2212 负号 /
+字号实测下限（Nature 5pt）/ 关键词在场 / 页面物理尺寸。CI 友好退出码。
+自测记录：抓到 Origin 导出 SimSun、抓到本仓库自己图的 4.6pt 下标——修复后 ALL PASS。
+
 ## 路线图
 
-不足清单与解决路径见 [`docs/GAP_ANALYSIS.md`](docs/GAP_ANALYSIS.md)（P0：figcheck 审计 CLI——已确认的开源空白；三领域配方库；P1：3D 最小集 PyVista+OVITO）。2D/3D 图型全谱目录与学习路线见 [`docs/CHART_CATALOG.md`](docs/CHART_CATALOG.md)。商业化三层路线见 [`docs/COMMERCIALIZATION.md`](docs/COMMERCIALIZATION.md)。
+不足清单见 [`docs/GAP_ANALYSIS.md`](docs/GAP_ANALYSIS.md)（G2 figcheck ✅ 已交付；
+P0 剩余：谱图族+生物配方库；P1：3D 最小集 PyVista+OVITO）。图型全谱目录见 [`docs/CHART_CATALOG.md`](docs/CHART_CATALOG.md)。商业化三层路线见 [`docs/COMMERCIALIZATION.md`](docs/COMMERCIALIZATION.md)。
 
 ## License
 

@@ -138,8 +138,8 @@ ax.text(0.03, 0.05,
         f"Pt-N {cn['N']:.1f} @ {r_['N']:.2f} " + chr(197) + "\n"
         f"Pt-C {cn['C1']:.1f} @ {r_['C1']:.2f} " + chr(197) + "\n"
         f"C(2nd) {cn['C2']:.1f} @ {r_['C2']:.2f} " + chr(197) + "\n"
-        f"R$_f$ = {out.rfactor:.4f}",
-        transform=ax.transAxes, fontsize=6.5, va="bottom")
+        f"R$_f$ = {out.rfactor:.4f}",  # 7.2pt: mathtext subscript >= 5pt floor
+        transform=ax.transAxes, fontsize=7.2, va="bottom")
 ax.set_title("c", loc="left", fontweight="bold", fontsize=8, pad=4)
 
 outfig = HERE / "xafs_good_fit_triptych"
