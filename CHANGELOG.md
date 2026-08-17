@@ -24,6 +24,15 @@
 - 实战背景：Nature Communications 投稿六图 + SI 三图全流程
   （最终坐标系原则、数值一致性校验、QA 闭环均在该投稿中验证）
 
+### 补充（08-18 三批）
+
+- **前人 Origin 模板提取与复刻**：data/raw/Figure 7 张 WMF 转换 + 4 张
+  视觉交叉分析 → docs/ORIGIN_TEMPLATE_SPEC.md（蓝#1F77B4数据/红#D62728
+  拟合配对、1.5–2pt 实线、拟合图四边框内向刻度、XANES 开放框、轴题
+  照抄文本、小波 jet+colorbar；字体统一 Arial 的融合决策注明）
+- recipe 08 复刻图（183×130mm 四联：XANES/k²χ(k)拟合/R空间拟合带注记框/
+  jet 小波）——模板应用到我们自己的 Pt_sample 分析，视觉审计 CLEAN
+
 ### 补充（08-18 二批）
 
 - **Origin 出图全链打通**（recipe 07）：originpro from_list 填数 →
