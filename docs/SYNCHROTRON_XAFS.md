@@ -78,9 +78,29 @@ Larch 自带 6 个 feffit worked example：单路径 / 多路径 / 多数据集 
 - 后续复现路线：拿 OPJ/原始 μ(E) → Larch 重跑 pre_edge→autobk→xftf→feffit
   → 与表中锁定值对账（数值一致性纪律）
 
-## 六、下一步（backlog）
+## 六、实跑记录（2026-08-17，xraylarch 2026.3.1 本机）
 
-1. 跑通 Larch 6 个 feffit example（本地装库被取消，待用户点头再装）
-2. 用 Ravel FeS2 课程数据做完整练习（透射 EXAFS + 晶体结构都有）
-3. 小波：Larch cauchy_wavelet vs ESRF BM20 在线工具各出一图对比
-4. 沉淀第一个 XAFS recipe（XANES 叠图 + R 空间图，带四查过检证据）
+- 安装：`pip install xraylarch`（连带 pymatgen/larixite/xraydb/silx 全家）
+- 示例数据：pip wheel 不带 examples——`git clone --depth 1
+  https://github.com/xraypy/xraylarch`，取 `examples/xafsdata/pt_metal_rt.xdi`
+  （MIT，已复制进 `skills/sci-figure-plot/recipes/data/`）
+- **首个 recipe 已沉淀**：`skills/sci-figure-plot/recipes/xafs_basic_chain_ptfoil.py`
+  ——Pt 箔 L3 边完整链（read→pre_edge→autobk→xftf，k=3–11.5/k-weight=2
+  对齐本地报告条件）+ 183mm 三联图（XANES/k²χ(k)/|χ(R)|），视觉审计 CLEAN
+- **实测验证**（物理正确性）：
+  - E0 自动定位 11562.0 eV（Pt L3 参考 11564 eV，差 2 eV 合理）
+  - 第一壳层 |χ(R)| 峰 2.45 Å + 相位修正 ≈ **2.77 Å = Pt 金属已知 Pt-Pt
+    键长精确吻合**——第三节"FT 峰位+0.3–0.5 Å≈真实键长"通则实测坐实
+- 踩坑记录（进教训）：透射 XDI 列是 energy/itrans/i0 **无现成 mu**，
+  须自算 `d.mu = -np.log(d.itrans/d.i0)`；pre_edge 输出属性名为
+  `edge_step/norm`（无 pre_edge_slope）
+
+## 七、下一步（backlog）
+
+1. ~~本地装库~~（✅ 2026-08-17 完成，见第六节实跑记录）
+2. 跑通 Larch 6 个 feffit example（feffit 拟合层尚未实跑）
+3. 用 Ravel FeS2 课程数据做完整练习（透射 EXAFS + 晶体结构都有）
+4. ~~沉淀第一个 XAFS recipe~~（✅ pt_foil 三联图 + 物理验证过检）
+5. 小波：cauchy_wavelet vs ESRF BM20 在线工具各出一图对比
+6. feffit 复现本地 Pt 单原子报告（Pt-C/N 4.3@2.02Å + 无 Pt-Pt 判据），
+   需 OPJ/原始 μ(E) 数据

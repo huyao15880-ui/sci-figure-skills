@@ -24,6 +24,14 @@
 - 实战背景：Nature Communications 投稿六图 + SI 三图全流程
   （最终坐标系原则、数值一致性校验、QA 闭环均在该投稿中验证）
 
+### 补充（同日四批）
+
+- **首个 XAFS recipe 落地**：`skills/sci-figure-plot/recipes/xafs_basic_chain_ptfoil.py`
+  ——Pt 箔 L3 边 Larch 完整链 + 183mm 三联图（视觉审计 CLEAN）；
+  物理验证：|χ(R)| 峰 2.45 Å + 相位修正 = 2.77 Å 与已知 Pt-Pt 键长精确吻合
+- xraylarch 2026.3.1 本机安装 + 实跑；透射 XDI 无 mu 列踩坑记录
+- SYNCHROTRON_XAFS 笔记增第六节实跑记录，backlog 更新
+
 ### 补充（同日三批）
 
 - **docs/SYNCHROTRON_XAFS.md**：同步辐射 XAFS 处理分析学习笔记——工具地图
