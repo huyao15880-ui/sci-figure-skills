@@ -24,6 +24,16 @@
 - 实战背景：Nature Communications 投稿六图 + SI 三图全流程
   （最终坐标系原则、数值一致性校验、QA 闭环均在该投稿中验证）
 
+### 补充（同日八批）
+
+- **可调拟合引擎**（recipe 06 xafs_feffit_pt_configurable.py）：四层自由度
+  CLI 化（数据层 rbkg / 拟合窗口 k·R·kw·dk·window / 结构模型
+  n4|c4|c2n2+键长 / 参数策略 S0² 固定·边界），feff6l 按几何哈希缓存；
+  --scan 敏感性批量扫描。实测四变体全部给出真实物理行为（kmax 敏感性
+  CN 2.97→3.63 单调漂移 = CN-S0² 简并的审稿级证据）
+- 新坑：FEFF POTENTIALS 每 unique pot 必须有原子；双 reff 路径用共享
+  alpha*reff 比例位移
+
 ### 补充（同日七批）
 
 - **feffit 毕业作**（recipe 05）：Pt-N4 方形平面模型（2.02 Å）→ feff6l

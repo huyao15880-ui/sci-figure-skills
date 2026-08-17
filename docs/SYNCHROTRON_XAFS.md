@@ -145,6 +145,27 @@ C/N 混配 + 更宽拟合窗（含第二壳层路径），我用纯 Pt-N4 单路
 拟合质量取决于结构模型，正是 feffit 的核心课。视觉审计 CLEAN
 （183×70 mm 双联图）。
 
+## 七点八、可调拟合引擎（recipe 06，"fit as you wish"）
+
+四层自由度全部 CLI 化：数据层（--rbkg/--e0-offset）→ 拟合窗口
+（--kmin/--kmax/--kweight/--rmin/--rmax/--dk/--window）→ 结构模型
+（--shell n4|c4|c2n2 + --dist-n/--dist-c，簇体重建+feff6l 缓存重算）→
+参数策略（--s02 固定值、--sig2-max/--e0-range/--r-range 边界）；
+另支持 --scan PARAM v1 v2... 敏感性批量扫描（审稿防御标准动作）。
+
+实测行为（每个变体都是真实物理，非摆设）：
+- --kmax 10：Rf 0.008（窗口缩短拟合变易）；CN 3.16
+- --shell c2n2：双路径分层键长 N 1.947/C 2.016 Å，加权 R 1.981
+- --s02 0.90：CN 3.60（S0² 与 CN 严格 trade-off，教学点）
+- --scan kmax 9.5→12.5：CN 2.97→3.63 单调爬升 + Rf 0.004→0.040
+  （CN–S0² 简并随 k 窗系统性漂移——审稿必问的敏感性证据一键可得）
+
+踩坑：FEFF 的 POTENTIALS 每个 unique pot 必须有原子（n4 模型不得声明
+C 电位）；c2n2 双 reff 用共享 alpha*reff 表达式做比例位移。
+
+商业注记：这即 web 服务"拟合参数面板"的 CLI 原型——面板选项 = 本
+引擎的 argparse 维度，后端 = do_fit()。
+
 ## 八、下一步（backlog）
 
 1. ~~本地装库~~（✅ 2026-08-17，第六节）
