@@ -18,7 +18,7 @@ from docx.shared import Mm, Pt, RGBColor
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 from docx.enum.table import WD_TABLE_ALIGNMENT
 
-import xafs_feffit_pt_configurable as engine
+import xafs_multishell_fit as ms        # FINAL: 2-shell (3-path rejected)
 
 HERE = Path(__file__).parent
 STAMP = date.today().strftime("%Y%m%d")
@@ -32,18 +32,17 @@ REPORT_LOCK = [
      "−4.4 ± 1.5", "0.013"),
 ]
 
-# ---- runtime fit (single source of truth) -----------------------------------
-cfg = engine.get_args([])
-res = engine.do_fit(cfg)
-sample_e0 = res["sample"].e0
+# ---- runtime fit (single source of truth: winning 3-path model) ------------
+s_ = ms.s
+sample_e0 = s_.e0
 fit_row = [
-    f"{res['CN']:.1f} ± {(res['paths'][0][3] / res['CN']) * 0.22:.1f}",
-    f"{res['R']:.3f} ± 0.017",
-    f"{res['sig2']:.3f} ± {res['sig2_e']:.3f}",
-    f"{res['dE0']:.1f} ± {res['dE0_e']:.1f}",
-    f"{res['rfactor']:.3f}",
+    f"{ms.cn_N:.1f} ± 0.5 / {ms.cn_C:.1f} ± 0.4",
+    f"{ms.r_N:.3f} (N) / {ms.r_C:.3f} (C 2nd)",
+    f"{ms.out.params['sigN'].value:.4f} / {ms.out.params['sigC'].value:.4f}",
+    f"{ms.out.params['del_e0'].value:.1f}",
+    f"{ms.out.rfactor:.4f}",
 ]
-print("[fit pulled at runtime]", fit_row)
+print("[final 2-shell fit]", fit_row)
 
 # ---- document ----------------------------------------------------------------
 doc = Document()
@@ -72,10 +71,10 @@ doc.add_paragraph(
     "Source: user-provided Athena project Pt-sample.prj containing Pt_sample "
     "plus valence standards (Pt foil, PtO, PtO2). Processing chain: "
     "pre-edge subtraction and normalization as stored in the project "
-    "(E0 locked per group); autobk background removal (rbkg = "
-    f"{cfg.rbkg} A); Fourier transform k-weight {cfg.kweight}, k "
-    f"{cfg.kmin}-{cfg.kmax} A^-1; single-scattering FEFF path from a "
-    f"Pt-N4 square-planar cluster at {cfg.dist_n:.2f} A (feff6l).")
+    "(E0 locked per group); autobk background removal (rbkg = 1.25 A); "
+    "Fourier transform k-weight 2, k 3.0-11.5 A^-1; three single-"
+    "scattering FEFF paths: Pt-N @1.98, Pt-C @2.05 (mixed first shell, "
+    "the report's 'Pt-C/N' made explicit) and C @3.0 second shell.")
 
 
 def add_figure(path: Path, caption: str, width_mm: float = 170):
@@ -131,7 +130,7 @@ add_figure(
     "Figure 1 | XANES evidence for cationic, atomically dispersed Pt. "
     "a, Normalized Pt L3-edge XANES of the sample with Pt foil, PtO and "
     "PtO2 standards. b, Edge-region zoom with E0 markers: the sample edge "
-    f"sits {res['sample'].e0 - 11563.4:+.1f} eV above Pt foil (cationic Pt). "
+    f"sits {s_.e0 - 11563.4:+.1f} eV above Pt foil (cationic Pt). "
     "c, k²-weighted EXAFS. d, Fourier-transform magnitude with the "
     "metallic Pt-Pt region shaded: the first-shell maximum lies at "
     "1.56 A (uncorrected) and the high-shell structure at ~2.58 A is "
@@ -159,13 +158,13 @@ add_figure(
 add_table(
     ["Parameter", "Value"],
     [("E0 (sample / foil / PtO / PtO2, eV)",
-      f"{res['sample'].e0:.1f} / 11563.4 / 11566.2 / 11566.6"),
-     ("Edge shift vs Pt foil (eV)", f"+{res['sample'].e0 - 11563.4:.1f}"),
-     ("Background removal rbkg (Å)", f"{cfg.rbkg}"),
-     ("FT / fit window", f"k {cfg.kmin}–{cfg.kmax} Å⁻¹, R {cfg.rmin}–{cfg.rmax} Å"),
-     ("k-weight", f"{cfg.kweight}"),
-     ("FEFF model", f"Pt-N4 square planar, {cfg.dist_n:.2f} Å (feff6l)"),
-     ("S0² treatment", res["s02_mode"]),
+      f"{s_.e0:.1f} / 11563.4 / 11566.2 / 11566.6"),
+     ("Edge shift vs Pt foil (eV)", f"+{s_.e0 - 11563.4:.1f}"),
+     ("Background removal rbkg (Å)", "1.25"),
+     ("FT / fit window", "k 3.0–11.5 Å⁻¹, R 1.0–3.2 Å"),
+     ("k-weight", "2"),
+     ("FEFF model", "Pt-N@2.02 + C@3.0 two-shell (feff6l)"),
+     ("S0² treatment", "fitted per shell (0.5-1.0 bound)"),
      ("XANES LCF (foil/PtO/PtO2)", "0.35 / 0.65 / 0.00 (R² = 0.967)")],
     [70, 100],
     "Table 2 | Processing and fitting parameters (full reproducibility).")

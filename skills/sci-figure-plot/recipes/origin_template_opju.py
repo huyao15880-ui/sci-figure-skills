@@ -27,8 +27,8 @@ prj = read_athena(str(HERE / "data" / "Pt-sample.prj"))
 s, f = prj.Pt_sample, prj.Pt_Foil
 autobk(s, e0=s.e0, rbkg=1.0, kweight=2)
 xftf(s, kmin=3.0, kmax=11.5, dk=1.0, kweight=2, window="kaiser")
-import xafs_multishell_fit as ms        # runs optimal fit (rbkg 1.25, 2-shell)
-d_, dm = ms.d, ms.m                     # R-space data / fit from recipe 10
+import xafs_multishell_fit as ms        # FINAL: 2-shell, all params physical
+d_, dm = ms.d, ms.m                     # (3-path rejected: sigma^2 collapsed)
 
 
 def lt(code, tag):
