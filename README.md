@@ -65,7 +65,7 @@ cp -r sci-figure-skills/skills/* ~/.claude/skills/     # Claude Code
 
 ## 路线图
 
-不足清单与解决路径见 [`docs/GAP_ANALYSIS.md`](docs/GAP_ANALYSIS.md)（P0：figcheck 审计 CLI——已确认的开源空白；三领域配方库）。商业化三层路线见 [`docs/COMMERCIALIZATION.md`](docs/COMMERCIALIZATION.md)。
+不足清单与解决路径见 [`docs/GAP_ANALYSIS.md`](docs/GAP_ANALYSIS.md)（P0：figcheck 审计 CLI——已确认的开源空白；三领域配方库；P1：3D 最小集 PyVista+OVITO）。2D/3D 图型全谱目录与学习路线见 [`docs/CHART_CATALOG.md`](docs/CHART_CATALOG.md)。商业化三层路线见 [`docs/COMMERCIALIZATION.md`](docs/COMMERCIALIZATION.md)。
 
 ## License
 
