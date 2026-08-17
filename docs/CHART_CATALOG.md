@@ -61,7 +61,9 @@
 | DPV/SWV | E × I 峰 | matplotlib（浓度色映射✅） | ✅ |
 | EIS Nyquist + Bode + 拟合电路 | Z' × −Z'' | matplotlib/等效电路 | 🔜 |
 | Tafel / 活化过电位 | log j × η | matplotlib | 🔜 |
-| EXAFS k²χ(k)/R 空间拟合 | k/R × 信号 | matplotlib | 🔜 |
+| EXAFS k²χ(k)/R 空间拟合 | k/R × 信号 | matplotlib + Larch | 🔜 |
+| XANES 叠图/LCF | E × μ(E) | matplotlib + Larch | 🔜 |
+| EXAFS 小波图 | k–R 二维 | Larch xafs_wavelets / ESRF BM20 | ⬜ |
 | 等温线/吸附模型 | p/p₀ × 量 + 模型 | matplotlib | ⬜ |
 | PL/UV-Vis + Tauc | 波长 × 吸收 + 带隙 | matplotlib | 🔜 |
 | DFT PDOS/d 带（见 skill） | E × DOS | matplotlib | ✅ |

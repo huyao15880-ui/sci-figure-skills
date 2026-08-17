@@ -26,6 +26,19 @@
 - **仿真链**：COMSOL 后处理图走 cli-anything-comsol（见 toolchain §3），
   网格/边界条件参数写入图注或 SI
 
+## 同步辐射 / XAFS（详见 docs/SYNCHROTRON_XAFS.md 学习笔记）
+
+| 数据类型 | 典型图型 | 工具链 |
+|---|---|---|
+| XANES 谱 | 归一化 μ(E) 叠图 + 一阶导 | Larch pre_edge；LCF/PCA 组分分析 |
+| EXAFS | k²χ(k) + R 空间幅值 + 拟合线 | Larch autobk→xftf→feffit（FEFF 路径） |
+| 小波 | k–R 二维色图 | Larch xafs_wavelets / ESRF BM20 |
+
+硬纪律：拟合四件套（k/R 范围、拟合空间、k-weight）必须进图注；
+参数合理域 0.8<S0²<1.0、|ΔE0|<10 eV、R-factor<0.02 逐项检查；
+FT 谱峰位 +0.3–0.5 Å ≈ 修正后真实键长（图注可解释）；
+单原子判据 = 无 M-M 金属路径。
+
 ## 领域数据集
 
 本地数据集按 `datasets/DATASET_INDEX.md` 规范注册（数据不进仓库，

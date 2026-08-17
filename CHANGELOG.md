@@ -24,6 +24,15 @@
 - 实战背景：Nature Communications 投稿六图 + SI 三图全流程
   （最终坐标系原则、数值一致性校验、QA 闭环均在该投稿中验证）
 
+### 补充（同日三批）
+
+- **docs/SYNCHROTRON_XAFS.md**：同步辐射 XAFS 处理分析学习笔记——工具地图
+  （Larch/Larix/Demetter 理念/FEFF/小波三工具）、Larch API 级标准处理链
+  （pre_edge→autobk→xftf→feffit + 6 个 worked example）、参数纪律
+  （四件套报告/合理域/相位修正通则）、XAFS 绘图五件套规范、本地 Pt
+  L3-edge 实战锚（单原子判据等）
+- nanomaterials PROFILE 增同步辐射节；CHART_CATALOG 补 XANES/小波图型
+
 ### 补充（同日二批）
 
 - **docs/CHART_CATALOG.md**：2D/3D 图型全谱目录（分布/关系/比较/组成/
