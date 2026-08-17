@@ -1,15 +1,18 @@
 ---
 name: sci-figure-compose
-description: [阶段2-4·组图] Compose final multi-panel journal figure from ready panel PDFs: 1:1 mm-exact composition, frame/axis alignment, row-baseline letters, four-check audit, .ai round-trip. NOT for drawing individual panels or choosing chart types.
+description: "[阶段2-4·组图] 从就绪的面板 PDF 组装正式多面板期刊图：1:1 mm 精确拼版、框体/轴线对齐、行基线字母、四查审计、.ai round-trip。不画单面板（用 sci-figure-plot）、不选图型。"
+version: 1.0.0
+domains: [nanomaterials, biology, art-design]
 ---
 
-# sci-figure-compose — 期刊级多 panel 组图流水线
+# sci-figure-compose — 期刊级多面板组图流水线
 
-**实测来源**：2026-08-17 Fig5 全流程（六 panel + inset，183×214mm，Nature Comms 投稿）。
-参考实现全部在项目内：`code/src/panel_5*.py`、`normalize_panels_1to1.py`、`compose_fig5.py`、`docs/AdobeAI科研排版规范_v1.md`。
+实测来源：2026-08-17 Fig5 全流程（六 panel + inset，183×214 mm，Nature
+Communications 投稿）。参考实现模式：每面板一个脚本 → 1:1 规格化 →
+PyMuPDF 组页 → 四查审计 → .ai 交付。
 
 ## 何时运行
-- 把 ≥2 个 panel 拼成正式 figure（正文或 SI）
+- 把 ≥2 个面板拼成正式 figure（正文或 SI）
 - 单图重规格化（字号/线宽统一到期刊区间）
 - 生成 .ai 可编辑交付版
 
@@ -18,47 +21,56 @@ description: [阶段2-4·组图] Compose final multi-panel journal figure from r
 ### 1. 版式先行
 先定网格再画图：目标画布宽（双栏 183 / 单栏 89 mm）、行配对按**等高优先**、
 读序蛇形（行内左→右，右列可上下叠）。字母跟空间走，叙事跟字母走。
-同高配不进 183mm 时改 panel 尺寸，不硬塞。
+同高配不进 183mm 时改面板尺寸，不硬塞。
 
-### 2. Panel 1:1 规格化（禁统一缩放）
-- 每 panel `figsize = 目标mm/25.4`，字号/线宽直接写**最终值**（matplotlib 输出后再缩放=一致性灾难）
+### 2. 面板 1:1 规格化（禁统一缩放）
+- 每面板 `figsize = 目标mm/25.4`，字号/线宽直接写**最终值**
+  （matplotlib 输出后再缩放 = 一致性灾难）
 - 全图统一规格表：刻度 5.5pt / 轴题 6pt / 图内标题 6.5pt bold / 图例 5–5.5pt /
-  主曲线 1.0 / 次曲线 0.5–0.75 / spine 0.35 / 分隔线 0.25–0.3（Nature：字 5–7pt、线 0.25–1pt）
-- `savefig(..., bbox_inches='tight', pad_inches=0.02)`（默认 0.1in pad 会让每 panel 四周多 2.54mm 白边）
+  主曲线 1.0 / 次曲线 0.5–0.75 / spine 0.35 / 分隔线 0.25–0.3
+  （Nature：字 5–7pt、线 0.25–1pt）
+- `savefig(..., bbox_inches='tight', pad_inches=0.02)`
+  （默认 0.1in pad 会让每面板四周多 2.54mm 白边）
 - 数学文本陷阱：mathtext 默认 DejaVu！要么 `mathtext.fontset:'custom'` + Arial，
-  要么用 Unicode 上标（R² 用 '²'）。负号一律 U+2212（Python 格式化输出的是 ASCII '-'，须 replace）
-- 批量改规格用**精确字符串替换 + 出现次数断言**（`normalize_panels_1to1.py` 模式），防误伤
+  要么用 Unicode 上标（R² 用 '²'）。负号一律 U+2212（Python 格式化输出的是
+  ASCII '-'，须 replace）
+- 批量改规格用**精确字符串替换 + 出现次数断言**，防误伤
 
 ### 3. 组图（PyMuPDF，PDF-on-PDF）
-- 毫米精确 `page.show_pdf_page(rect, src, 0)`，rect = 原生尺寸 → 零缩放，矢量/字体原样保留
+- 毫米精确 `page.show_pdf_page(rect, src, 0)`，rect = 原生尺寸 → 零缩放，
+  矢量/字体原样保留
 - ⚠️ **show_pdf_page 产生 XObject 嵌套**——AI 里双击才能进、内部元素不可直选。
   **需要人工编辑的组图一律走 SVG 拼接**（每元素独立路径/文本，AI 直接选中）
-- **轴线对齐 ≠ 包络对齐**：从每 panel 的 600dpi PNG 检测 x 轴线
-  （自底向上第一条横向墨迹游程 ≥55% 宽的行；含 tight-pad 偏移，测出的偏移已含内边距），
-  行内共轴线：`axis_y = row_top + max(h_i - off_i)`，`top_i = axis_y - (h_i - off_i)`
-- 行距 = 最深标签栈 + 字母悬挂高度（8pt 字母需 ~5mm 余量，顶部页边 ≥7mm 否则字母被裁）
-- 行左对齐共线（居中会左缘参差）；panel 字母 8pt Helvetica-Bold 悬左上 2.5mm（基线）
-- **对齐判据（Fig3 定稿）**：同尺寸框体 → 顶边对齐（框即基准，轴线可差 2–4mm）；
-  混尺寸行才用轴线对齐；**字母行内共基线**（锚行顶 −2.5mm，不跟 panel 顶缘）
-- **行内等尺寸是纪律**：同行 panel 同宽/等大，尺寸不齐改 figsize，不硬拼
-- 布局数据 dump 成 JSON（`compose_fig5.py` 的输出），供 .ai 步与复核用
+- **轴线对齐 ≠ 包络对齐**：从每面板的 600dpi PNG 检测 x 轴线
+  （自底向上第一条横向墨迹游程 ≥55% 宽的行；含 tight-pad 偏移，测出的偏移
+  已含内边距），行内共轴线：`axis_y = row_top + max(h_i - off_i)`，
+  `top_i = axis_y - (h_i - off_i)`
+- 行距 = 最深标签栈 + 字母悬挂高度（8pt 字母需 ~5mm 余量，顶部页边 ≥7mm
+  否则字母被裁）
+- 行左对齐共线（居中会左缘参差）；面板字母 8pt Helvetica-Bold 悬左上 2.5mm
+  （基线）
+- **对齐判据**：同尺寸框体 → 顶边对齐（框即基准，轴线可差 2–4mm）；
+  混尺寸行才用轴线对齐；**字母行内共基线**（锚行顶 −2.5mm，不跟面板顶缘）
+- **行内等尺寸是纪律**：同行面板同宽/等大，尺寸不齐改 figsize，不硬拼
+- 布局数据 dump 成 JSON，供 .ai 步与复核用
 
-### 3.5 Plotly 字号补偿（2026-08-17 实证，写入 skill）
-Plotly 的 `font.size` 单位是**像素**不是磅——在小画布（<100mm）上 px→pt 换算缩水 ~0.7×。
-**修正公式**：`设定值 = 目标pt × 1.43`（例：目标 5.5pt → 设 7.9，渲染后 = 5.5pt）。
-**Checkpoint 必须验证 PDF 文本层实际字号**（`span['size']`），不是源码设定值。
+### 3.5 Plotly 字号补偿
+Plotly 的 `font.size` 单位是**像素**不是磅——小画布（<100mm）上 px→pt 换算
+缩水 ~0.7×。**修正公式**：`设定值 = 目标pt × 1.43`（例：目标 5.5pt → 设 7.9，
+渲染后 = 5.5pt）。**Checkpoint 必须验证 PDF 文本层实际字号**（`span['size']`），
+不是源码设定值。
 
-### 3.6 排版能力边界断言（2026-08-17 Panel c 六连败教训）
-- 密集散点（≥6 点在 <40% 画布区域内）的标签避让**超出 AI 自动排版能力**
-- **断言**：同一 panel 的标签布局连续修改 2 次仍不满意 → **强制输出 SVG 素材 + 建议用户手动编辑**
-  （`raise LayoutHandoff()`），不进行第 3 次自动尝试
+### 3.6 排版能力边界断言
+- 密集散点（≥6 点在 <40% 画布区域内）的标签避让**超出自动排版能力**
+- **断言**：同一面板的标签布局连续修改 2 次仍不满意 → **强制输出 SVG 素材 +
+  建议用户手动编辑**，不进行第 3 次自动尝试
 
-### 4. 成品四查（图件版 delivery-gate 5k，阻断级）
+### 4. 成品四查（阻断级审计）
 ① 页内性（预览四边零墨溢出）② 字体白名单（get_fonts 仅目标家族）
 ③ 负号审计（文本层无 ASCII '-' 数字）④ 内容关键词抽查（get_text 找关键标注）
-**⑤ 字号实测（08-17 新增）**：PDF 文本层 `span['size']` 最小值 ≥ 期刊下限（Nature ≥5pt / AM ≥6pt）——
-不是源码设定值，是渲染后实际值（Plotly px≠pt 缩水防线）
-审计代码模式见本轮复盘，随项目 `compose_*.py` 附带。
+**⑤ 字号实测**：PDF 文本层 `span['size']` 最小值 ≥ 期刊下限
+（Nature ≥5pt / AM ≥6pt）——不是源码设定值，是渲染后实际值（Plotly px≠pt
+缩水防线）
 
 ### 5. .ai 交付（唯一可靠路线）
 **打开已验证的 PDF 另存 .ai**（Illustrator `file open` → `file save-as`），
@@ -66,12 +78,12 @@ Plotly 的 `font.size` 单位是**像素**不是磅——在小画布（<100mm�
 **禁止**在 AI 里按坐标重新 place 直排——AI 内部坐标系与画板原点不一致，
 实测内容偏移 + 字体掉进宋体回退，且无可靠结果回传通道。
 
+## 短绳执行纪律（short-leash）
 
-## 短绳执行纪律（short-leash，2026-08-17 补，源自 fleet-cmdline-overflow-short-leash 迁移）
+长绳 = 一把渲染多个面板 / 改完不验产物 / 数据口径错了等到组图才发现。
+以下为强制：
 
-长绳 = 一把渲染多个 panel / 改完不验产物 / 数据口径错了等到组图才发现。以下为强制：
-
-1. **一 panel 一绳**：写脚本 → 渲染 → 验证 → 才准画下一个。禁止批量渲染循环
+1. **一面板一绳**：写脚本 → 渲染 → 验证 → 才准画下一个。禁止批量渲染循环
    （`for s in a b c; do python panel_$s.py; done` 是长绳反模式）
 2. **每条绳以 checkpoint 收尾**，与渲染同一条命令执行、当场输出：
    - 尺寸：PDF 实测 mm 对目标（±1.5mm）
@@ -81,27 +93,26 @@ Plotly 的 `font.size` 单位是**像素**不是磅——在小画布（<100mm�
 3. **每次编辑验证到产物**：改源码后必须查 PDF 文本层，"脚本跑完"≠"改上了"
    （heredoc 转义静默失败学费）；源码侧用精确字符串 + 出现次数断言
 4. **checkpoint 失败 = 当条绳内即修**，不攒批；修复后重跑同一 checkpoint
-
 5. **checkpoint 含亲眼验证**：文本层/字体/尺寸三查之外，agent 必须 VIEW 渲染图
    （图像读取/视觉模型）确认无重叠、无错位后才算过关——"渲染成功≠视觉合格"
-   （4c 两连失误学费：值相近的点贴点+图例压标签，文本层全 PASS 但视觉一塌糊涂）
-6. **弹图带回执**：给用户打开预览必须确认执行回执（Start-Process 后 Write-Output），
-   断言失败会吞掉后续命令——"已弹出"不可凭命令应该跑了就报
+   （实测学费：值相近的点贴点 + 图例压标签，文本层全 PASS 但视觉一塌糊涂）
+6. **弹图带回执**：给用户打开预览必须确认执行回执，断言失败会吞掉后续命令——
+   "已弹出"不可凭命令应该跑了就报
 
 ## 教训集（违反即返工）
-- 布局元素两轮微调仍不好 → **换结构**，不要第三轮微调（5f 左侧文字三连败教训）
-- 讲不了图的内容（审计句/计数）进图注，不占 panel（5g 被砍教训）
+- 布局元素两轮微调仍不好 → **换结构**，不要第三轮微调
+- 讲不了图的内容（审计句/计数）进图注，不占面板
 - 图内文字写给领域读者：机制描述（shuffled labels）优于统计术语（null）
-- 观测统计量标记用 轴上▼/短针，不用全高竖线
+- 观测统计量标记用轴上 ▼/短针，不用全高竖线
 - 重渲染后衍生品必须重测（compose 运行时自动读 PDF 尺寸，不手工维护数字表）
 - inset/小图先查字宽 vs 空区宽度（in = 文字宽/4.48，图内空区毫米级预算）再放字
-- 配对点图防叠：同组多标记（比较器×方向×批次）一律**全水平躲让**（每组独立 x 偏移），
-  禁止同 x 垂直堆放——垂直间距 < 点径即花斑（Fig4a 学费）
-- 图例/注释放位前先**几何核算**：算目标元素与所有点群/文字的 axes 分数包围盒，留 ≥0.05 间隙；
-  高位数据列（如跨零线的组）的上方不是空区（Fig4a 图例压 PtSAs 点学费）
-- 审计含**内容边界**（墨迹极值必须页内，PDF MediaBox 外会被静默裁切）（Fig3 v2 双行溢出学费）
+- 配对点图防叠：同组多标记（比较器×方向×批次）一律**全水平躲让**
+  （每组独立 x 偏移），禁止同 x 垂直堆放——垂直间距 < 点径即花斑
+- 图例/注释放位前先**几何核算**：算目标元素与所有点群/文字的 axes 分数
+  包围盒，留 ≥0.05 间隙；高位数据列（如跨零线的组）的上方不是空区
+- 审计含**内容边界**（墨迹极值必须页内，PDF MediaBox 外会被静默裁切）
 
 ## 与其他技能接口
-- `delivery-gate`：图件四查已并入其 5k 关
-- `sci-figure-toolchain` / `nature-figure-workflow`：上游单 panel 绘制与风格
-- 规范全文：项目 `docs/AdobeAI科研排版规范_v1.md`
+- 上游单面板：sci-figure-plot + matplotlib 引擎纪律
+- 矢量导出/字体转曲：sci-figure-toolchain（Inkscape 路线）
+- 交付自检闸门：四查审计已设计为可并入项目级 delivery gate

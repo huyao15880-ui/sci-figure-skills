@@ -1,27 +1,29 @@
 ---
 name: sci-figure-plot
-description: [阶段1·单图] Draw ONE publication panel with matplotlib from prepared CSV (DFT PDOS / charge density / electrochemistry curves). NOT for multi-panel composition or chart-type choice.
+description: "[阶段1·单图] 从准备好的 CSV 绘制单个投稿级面板（DFT PDOS / 电荷密度 / 电化学曲线 / 校准统计）。约定优先：统一样式层级使面板可自由进组图。不做多面板组图（用 sci-figure-compose）或图型选择（用选型顾问）。"
+version: 1.0.0
+domains: [nanomaterials, biology]
 ---
 
-# Scientific Figure Plotting (DFT / Electrochemistry)
+# sci-figure-plot — 单面板科研绘图（DFT / 电化学 / 校准统计）
 
-## Overview
+约定优先（conventions-first）：所有图遵循统一样式层级，面板可自由组合进组图。
 
-A conventions-first approach to generating publication-quality figures with matplotlib. All figures follow a unified style hierarchy so panels can be freely combined into composite figures.
+## 何时使用
+- 画**一个**投稿级数据面板（CSV/计算输出 → 单面板矢量图）
+- 面板将进入组图（输出规格必须与组图规划一致，先读 sci-figure-compose 的版式）
 
-## Directory Structure
+## 目录结构（每图一个自包含文件夹）
 
 ```
 figure_N/
-  data/          ← input: .tif from VESTA, POSCAR, PDOS CSV, CHGDIFF.vasp
-  output/        ← generated: individual .tiff panels
-  plot_xxx.py    ← one script per panel type
-  plot_tot.py    ← combiner: assembles output/ images into final figure
+  data/          ← 输入：VESTA 的 .tif、POSCAR、PDOS CSV、CHGDIFF.vasp
+  output/        ← 产出：单个面板文件
+  plot_xxx.py    ← 每种面板一个脚本
+  plot_tot.py    ← 组合器：把 output/ 的面板拼成最终图
 ```
 
-Each folder is a self-contained figure. `plot_tot.py` reads from `output/` and writes the final combined `.tiff`.
-
-## Style Constants
+## 样式常量
 
 ```python
 import matplotlib.pyplot as plt
@@ -30,28 +32,29 @@ plt.rcParams["font.family"] = "Arial"
 DPI = 600
 FMT = ".tiff"
 
-# Individual panel size
+# 单面板尺寸（进组图时以组图规划的目标 mm 为准，figsize = mm/25.4）
 FIGSIZE_SINGLE = (6.2, 4.8)
-# Combined multi-panel
-FIGSIZE_WIDE   = (12.5, 7.0)   # adjust height per row count
+FIGSIZE_WIDE   = (12.5, 7.0)   # 行数多时调高度
 
-# Typography
-FS_PANEL_LABEL = 22   # panel letters: a, b, c ...
+# 字号（最终物理尺寸下的 pt 值）
+FS_PANEL_LABEL = 22   # 面板字母 a, b, c ...（独立预览尺寸时）
 FS_AXIS_LABEL  = 15
 FS_TICK        = 13
 FS_VALUE_LABEL = 12
 
-# Bar width
 BAR_W = 0.42
 
-# Spine / tick styling
 def style_ax(ax):
     for sp in ax.spines.values():
         sp.set_linewidth(1.0)
     ax.tick_params(direction="in", labelsize=FS_TICK, width=1.0, length=4)
 ```
 
-## Color Palette (boride series)
+> 注意：上表字号是「独立大图预览」体系；**进组图/期刊交付时**一切以
+> sci-figure-compose 的最终坐标系规格表为准（刻度 5.5pt / 轴题 6pt 一类），
+> 两套体系禁止混用在同一交付物内。
+
+## 材料系列色板（boride 体系实例，可按体系替换）
 
 ```python
 COLORS = {
@@ -62,16 +65,19 @@ COLORS = {
 }
 ```
 
-## Panel Label Convention
+替换原则：同体系内保持等明度差、色盲可分（Okabe-Ito 或
+`domains/art-design/PROFILE.md` 的色板规范）。
+
+## 面板字母约定
 
 ```python
-ax.text(0.01, 0.98, "a",
-        transform=ax.transAxes,
-        fontsize=22, fontweight="bold", color="black",
-        ha="left", va="top")
+ax.text(0.01, 0.98, "a", transform=ax.transAxes,
+        fontsize=22, fontweight="bold", color="black", ha="left", va="top")
 ```
 
-## find_image Helper (used in plot_tot.py)
+（组图时字母由组图层统一放置，单面板不预置——见 compose 规则。）
+
+## find_image 辅助（plot_tot.py 用）
 
 ```python
 from pathlib import Path
@@ -85,7 +91,7 @@ def find_image(name, search_dirs=("output", "data")):
     raise FileNotFoundError(f"Cannot find image: {name}")
 ```
 
-## PDOS Panel
+## PDOS 面板（DFT 态密度）
 
 ```python
 import pandas as pd
@@ -94,7 +100,7 @@ import numpy as np
 df = pd.read_csv("data/FeCoNiB_N_metal_vertical_pdos.csv")
 E   = df["energy_eV_vs_Ef"].values
 dos = df["top_metal_d"].values
-eps_d = -2.310   # precomputed d-band center
+eps_d = -2.310   # 预计算的 d 带中心
 
 fig, ax = plt.subplots(figsize=FIGSIZE_SINGLE)
 ax.axvline(eps_d, color="#9E9E9E", ls="--", lw=2.4, label=r"$\varepsilon_d$")
@@ -107,7 +113,7 @@ plt.tight_layout()
 plt.savefig(f"output/FeCoNiB_pdos{FMT}", dpi=DPI, bbox_inches="tight")
 ```
 
-## d-Band Center Bar Chart
+## d 带中心柱状图
 
 ```python
 data = {
@@ -131,7 +137,7 @@ plt.tight_layout()
 plt.savefig(f"output/epsilon_d_bar_chart{FMT}", dpi=DPI, bbox_inches="tight")
 ```
 
-## Contact Distance (from POSCAR)
+## 接触距离（从 POSCAR）
 
 ```python
 import numpy as np
@@ -167,7 +173,7 @@ def contact_distance(poscar):
     return min(pbc_dist(frac[i], frac[j], lattice) for i in surf for j in ads)
 ```
 
-## Planar-Average Charge Density (CHGDIFF.vasp)
+## 平面平均电荷密度（CHGDIFF.vasp）
 
 ```python
 import re, numpy as np
@@ -180,7 +186,7 @@ def read_chgcar_planar(file):
     volume  = abs(np.linalg.det(lattice))
     c_len   = np.linalg.norm(lattice[2])
     natoms  = sum(int(x) for x in lines[6].split())
-    gl = 8 + natoms          # grid line index (adjust for Selective Dynamics)
+    gl = 8 + natoms          # 网格行索引（有 Selective Dynamics 时调整）
     nx,ny,nz = map(int, lines[gl].split()[:3])
     vals = [float(x) for x in re.findall(r"[+-]?[\d.]+(?:[Ee][+-]?\d+)?",
                                           "\n".join(lines[gl+1:]))
@@ -189,7 +195,7 @@ def read_chgcar_planar(file):
     return np.linspace(0, c_len, nz, endpoint=False), rho_z
 ```
 
-## Composite Panel (plot_tot.py pattern)
+## 组合面板（plot_tot.py 模式）
 
 ```python
 import matplotlib.pyplot as plt, matplotlib.image as mpimg
@@ -197,11 +203,7 @@ import matplotlib.pyplot as plt, matplotlib.image as mpimg
 fig = plt.figure(figsize=(12.5, 7.0))
 gs  = fig.add_gridspec(2, 3, width_ratios=[1,1,1.05], wspace=0.02, hspace=0.02)
 
-layout = {
-    "a": gs[0,0], "b": gs[0,1],
-    "c": gs[1,0], "d": gs[1,1],
-    "e": gs[:,2],
-}
+layout = {"a": gs[0,0], "b": gs[0,1], "c": gs[1,0], "d": gs[1,1], "e": gs[:,2]}
 for lab, cell in layout.items():
     ax  = fig.add_subplot(cell)
     img = mpimg.imread(find_image(lab_to_name[lab]))
@@ -213,32 +215,22 @@ plt.subplots_adjust(left=0.01, right=0.99, top=0.99, bottom=0.01)
 plt.savefig(f"output/Figure_N_combined{FMT}", dpi=DPI, bbox_inches="tight")
 ```
 
-## Obtain / Loss Arrow Schematic
+（投稿级正式组图不走 imshow 栅格拼装——矢量 1:1 拼版见 sci-figure-compose。）
 
-```python
-from matplotlib.patches import Polygon, Rectangle
-import numpy as np
+## 电化学/校准面板要点（DPV / CV / 校准统计）
 
-yellow, cyan = "#F2F247", "#57d9d9"
+- 曲线族色 = 浓度映射用 `viridis` + 共享 colorbar（Normalize 到全浓度域）
+- 校准图：散点 + OLS 拟合线 + 95% 置信带（t 分布）+ 注记 m/R²/LOD*
+- 注记数值**运行时从冻结统计文件读取**，禁止硬编码；LOD* 等探索性估计
+  必须带 * 号并在图注声明边界
+- 参考 `datasets/DATASET_INDEX.md` 中电化学数据集的字段约定
 
-def smooth(u): return 6*u**5 - 15*u**4 + 10*u**3
+## 常见错误
 
-def gradient(ax, x0, x1, y0, y1, c0, c1, n=2000):
-    dy = (y1-y0)/n
-    for i in range(n):
-        t = smooth(i/(n-1))
-        ax.add_patch(Rectangle((x0, y0+i*dy), x1-x0, dy*1.08,
-                                facecolor=(1-t)*c0+t*c1, edgecolor="none"))
-# Draw upward (yellow) and downward (cyan) gradient-tipped arrows
-# then label with rotated "Obtain" / "Loss" text at 90°
-```
-
-## Common Mistakes
-
-| Mistake | Fix |
-|---------|-----|
-| CHGDIFF.vasp has Selective Dynamics → wrong grid line index | Check `lines[7]` starts with `S` and shift `coord_line += 1` |
-| `imshow` distorts tif aspect ratio | Never set equal aspect manually; `imshow` handles it |
-| Combined tiff too large | Each `.tif` input should be cropped in VESTA before saving |
-| Gradient arrow shows banding | Increase `n` to 2000+ and overlap strips by `dy*1.08` |
-| Bar value clipped at top | Set `ax.set_ylim(0, max+0.5)` before adding text labels |
+| 错误 | 修正 |
+|---|---|
+| CHGCAR 有 Selective Dynamics → 网格行索引错 | 检查 `lines[7]` 是否以 S 开头并 `coord_line += 1` |
+| imshow 拉伸 tif 长宽比 | 不要手动设 equal aspect；imshow 自己处理 |
+| 组合 tiff 过大 | 每个 .tif 输入先在 VESTA 里裁剪再保存 |
+| 渐变箭头出现色带 | n 提到 2000+ 并用 `dy*1.08` 重叠条带 |
+| 柱顶数值被裁 | 放文字前 `ax.set_ylim(0, max+0.5)` |
