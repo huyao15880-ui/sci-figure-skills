@@ -24,6 +24,15 @@
 - 实战背景：Nature Communications 投稿六图 + SI 三图全流程
   （最终坐标系原则、数值一致性校验、QA 闭环均在该投稿中验证）
 
+### 补充（08-18 一批）
+
+- **XAFS 期刊风格交付报告**（xafs_report_builder.py）：Athena 工程 →
+  Word 报告一键生成——双图（XANES 四联证据图 + EXAFS 拟合图）、
+  Table 1 拟合参数对账表（vs 报告锁定值）、Table 2 处理参数复现表、
+  三条边界声明（LCF 解读/高壳层归属/样品身份假设）、复现命令清单；
+  全部拟合数值运行时从可调引擎拉取（零硬编码），自检 2图2表图注
+  计数通过，Word 渲染 QA 2 页无溢出。产品形态：客户 .prj → 本报告
+
 ### 补充（同日八批）
 
 - **可调拟合引擎**（recipe 06 xafs_feffit_pt_configurable.py）：四层自由度
