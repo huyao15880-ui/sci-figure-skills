@@ -24,6 +24,15 @@
 - 实战背景：Nature Communications 投稿六图 + SI 三图全流程
   （最终坐标系原则、数值一致性校验、QA 闭环均在该投稿中验证）
 
+### 补充（同日七批）
+
+- **feffit 毕业作**（recipe 05）：Pt-N4 方形平面模型（2.02 Å）→ feff6l
+  现算路径（踩坑：feff6l 裁剪版不认 RPATH）→ feffit 报告条件拟合 →
+  对账锁定值：CN 3.44±0.75 vs 4.3±0.5（1.1σ 一致）、ΔE0 误差棒内一致；
+  R/σ²/R-factor 差距定位为模型保真度（纯 N 单路径 vs C/N 混配+宽窗）
+- 183×70 mm 双联拟合图（k 空间+R 空间叠图带统计框），视觉审计 CLEAN
+- XAFS 学习线至此全链毕业：读谱→归一化→背景→FT→LCF→小波→FEFF→feffit
+
 ### 补充（同日六批）
 
 - **Pt 单原子真实数据复现**（用户供 Athena 工程 Pt-sample.prj，recipe 04）：
