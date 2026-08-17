@@ -95,12 +95,48 @@ Larch 自带 6 个 feffit worked example：单路径 / 多路径 / 多数据集 
   须自算 `d.mu = -np.log(d.itrans/d.i0)`；pre_edge 输出属性名为
   `edge_step/norm`（无 pre_edge_slope）
 
-## 七、下一步（backlog）
+## 七、feffit 拟合层实跑记录（2026-08-17，同日第二批）
 
-1. ~~本地装库~~（✅ 2026-08-17 完成，见第六节实跑记录）
-2. 跑通 Larch 6 个 feffit example（feffit 拟合层尚未实跑）
-3. 用 Ravel FeS2 课程数据做完整练习（透射 EXAFS + 晶体结构都有）
-4. ~~沉淀第一个 XAFS recipe~~（✅ pt_foil 三联图 + 物理验证过检）
-5. 小波：cauchy_wavelet vs ESRF BM20 在线工具各出一图对比
-6. feffit 复现本地 Pt 单原子报告（Pt-C/N 4.3@2.02Å + 无 Pt-Pt 判据），
-   需 OPJ/原始 μ(E) 数据
+**官方 examples 1–4 直跑 + 6 改造 headless 版**（5 不存在，官方即 1-4+6）：
+
+| Example | 主题 | 关键结果（实测） |
+|---|---|---|
+| feffit1 | Cu 单壳层 | n·S0²=0.93±0.04，σ²=0.0087（室温 Cu 教科书值），r=2.542 Å |
+| feffit2 | 多路径 + α·reff 热膨胀 | r=2.555 Å |
+| feffit3 | 多温度数据集共享 σ² 爱因斯坦模型 | 10K 下 σ²=0.0033 ✓ |
+| feffit4 | CN 直接拟合 | s02·n1=3.87（NiO 氧配位） |
+| feffit6 | **Z 敏感性 + 相位修正**（改造版入库 recipe 02） | 见下两条金矿 |
+
+**feffit6 两条教学金矿（ZnSe，8 种假设散射原子 Zn→Rb）**：
+1. **相位修正 FT 与散射体种类无关地给真距离**：R_phcor 全部落在
+   2.449–2.463 Å（离散 0.014 Å）= Zn-Se 真实键长 2.45 Å；未修正 R 从
+   2.471 漂到 2.425
+2. **反直觉：chi2 最低是 Br(5.1) 而非真解 Se(8.2)**——相邻 Z(33/34/35)
+   背散射振幅简并，单凭 chi2 判 Z 不可靠；须叠加 S0² 合理域
+   （Br 1.07 超域 / Se 0.89 ✓）+ E0（Se≈0.03）+ 化学先验裁决
+
+**小波实跑（recipe 03，Cauchy CCWT，Pt 箔）**：wavelet max R=2.65 Å /
+k=11.1 Å⁻¹——介于未修正 2.45 与真实 2.77 之间且高 k 段强
+（重散射体 Pt 特征），与轻/重散射体小波判别原理一致。
+
+**新踩坑（进教训集）**：
+- cauchy_wavelet 输出属性是 `wcauchy_mag/wcauchy_r`（非文档直觉的 w/r）
+- Arial 缺 U+207B（上标负号）与下标 ᵣ——单位上标一律 mathtext
+  `$^{-1}$`，禁用 Unicode 上标字符（glyph 审计硬规则再次实证）
+- 视觉模型会把高分辨率 mathtext 误报为"原始 $ 定界符"——用 PDF 文本层
+  `count('$')==0` 做确定性核验，不轻信单一视觉审计
+
+## 八、下一步（backlog）
+
+1. ~~本地装库~~（✅ 2026-08-17，第六节）
+2. ~~跑通官方 feffit examples~~（✅ 1-4 直跑 + 6 改造 headless，第七节；
+   官方无 5）
+3. FeS2 课程数据：Ravel 仓库为 S3 手工 zip 链接，暂未取——feffit 1-4+6
+   已覆盖等效学习价值（单壳/多路径/多数据集/CN/Z 敏感性），留作
+   nice-to-have
+4. ~~首个 XAFS recipe~~（✅ ×3：三联图/Z 敏感性/小波，全部过检）
+5. ~~小波实跑~~（✅ Cauchy CCWT，第七节；ESRF BM20 为在线 GUI 不便自动
+   对比，留人工）
+6. feffit 复现本地 Pt 单原子报告（Pt-C/N 4.3@2.02Å + 无 Pt-Pt 判据）：
+   **待数据**——已确认 data/raw 无 OPJ/原始 μ(E)（Pt-C.zip 为电化学
+   DPV 数据），需用户提供 XAFS 原始文件后执行

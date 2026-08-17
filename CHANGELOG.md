@@ -24,6 +24,21 @@
 - 实战背景：Nature Communications 投稿六图 + SI 三图全流程
   （最终坐标系原则、数值一致性校验、QA 闭环均在该投稿中验证）
 
+### 补充（同日五批）
+
+- **feffit 拟合层全实跑**：官方 examples 1-4 直跑（Cu 单壳/多路径热膨胀/
+  多温度共享 σ²/CN 拟合）+ feffit6 改造 headless 版入库（recipe 02，
+  ZnSe 八散射原子 Z 敏感性，2x4 面板图 183mm，视觉审计 CLEAN）
+- **两条教学金矿**：相位修正 FT 在全部 8 种假设下收敛 2.449-2.463 Å
+  精确锁死 Zn-Se 2.45 Å；chi2 最低是 Br 而非真解 Se（相邻 Z 简并）——
+  判散射原子须 chi2 + S0² 合理域 + 化学先验三重裁决
+- **recipe 03**：Cauchy 小波（Pt 箔，max R=2.65 Å/k=11.1，重散射体
+  高 k 特征），单栏 89mm 色图，glyph 审计零警告
+- 新踩坑入库：cauchy_wavelet 输出属性名、Arial 缺 U+207B/ᵣ（单位上标
+  一律 mathtext）、视觉模型误报 mathtext 用 PDF 文本层核验
+- Pt 单原子复现确认待数据（无 OPJ/原始 μ(E)）；FeS2 课程数据留
+  nice-to-have（S3 手工链接）
+
 ### 补充（同日四批）
 
 - **首个 XAFS recipe 落地**：`skills/sci-figure-plot/recipes/xafs_basic_chain_ptfoil.py`
